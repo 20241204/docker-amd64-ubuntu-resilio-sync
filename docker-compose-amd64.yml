@@ -1,0 +1,37 @@
+services:
+  resilio-sync-app:
+    build:
+      context: .
+    command:
+      - "run_sync"
+      - "--config"
+      - "/mnt/sync/conf/sync.conf"
+    platform: linux/amd64
+    container_name: resilio-sync-amd64-container
+    #environment:
+      #- http_proxy=http://IP:PORT
+      #- https_proxy=http://IP:PORT
+      #- all_proxy=socks5://IP:PORT
+    image: ghcr.io/20241204/docker-arch-resilio-sync:latest
+    #network_mode: bridge
+    networks:
+      - app-net
+    ports:
+      - "9999:9999"
+      - "55555:55555/tcp"
+      - "55555:55555/udp"
+    privileged: true
+    restart: "always"
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    volumes:
+     - ./sync/storage:/mnt/sync/storage    # sync 存储目录
+     - ./sync/conf:/mnt/sync/conf          # sync 配置文件
+     - ./sync/data:/mnt/sync/data          # sync data 数据共享同步目录
+networks:
+  app-net:
+    #driver: host
+    driver: bridge
+    #external: true
